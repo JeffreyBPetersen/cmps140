@@ -81,17 +81,54 @@ def depthFirstSearch(problem):
   print "Is the start a goal?", problem.isGoalState(problem.getStartState())
   print "Start's successors:", problem.getSuccessors(problem.getStartState())
   """
-  "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
+  "*** YOUR CODE HERE ***" #completed
+  currentPath = []
+  explored = [problem.getStartState()]
+  fringe = []
+	
+  for move in problem.getSuccessors(problem.getStartState()):
+    fringe.append(move)
+  
+  while len(fringe) > 0:
+    move = fringe[-1]
+    if not move[0] in explored:
+      explored.append(move[0])
+      currentPath.append(move)
+      if problem.isGoalState(move[0]):
+        path = []
+        for _, direction, _ in currentPath:
+          path.append(direction)
+        return path
+      for nextMove in problem.getSuccessors(move[0]):
+        fringe.append(nextMove)
+    else:
+      fringe.pop()
+      if move == currentPath[-1]:
+        currentPath.pop()
 
 def breadthFirstSearch(problem):
   "Search the shallowest nodes in the search tree first. [p 81]"
-  "*** YOUR CODE HERE ***"
+  "*** YOUR CODE HERE ***" #completed
+  explored = [problem.getStartState()]
+  fringe = [] # [(available move, previous move directions)...]
+	
+  for move in problem.getSuccessors(problem.getStartState()):
+    fringe.append((move, []))
+  
+  while len(fringe) > 0:
+    move, pastMoves = fringe.pop()
+    if not move[0] in explored:
+      explored.append(move[0])
+      if problem.isGoalState(move[0]):
+        return pastMoves + [move[1]]
+      for nextMove in problem.getSuccessors(move[0]):
+        fringe = [(nextMove, pastMoves + [move[1]])] + fringe
   util.raiseNotDefined()
       
 def uniformCostSearch(problem):
   "Search the node of least total cost first. "
   "*** YOUR CODE HERE ***"
+  
   util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
