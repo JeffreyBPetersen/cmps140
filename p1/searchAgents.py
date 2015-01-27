@@ -366,7 +366,7 @@ def cornersHeuristic(state, problem):
   total = 0
   for corner in range(4):
     total += (abs(state[0][0] - corners[corner][0]) + abs(state[0][1] - corners[corner][1]))*(not state[1][corner])
-  return total
+  return int(pow(total * 2, 0.5))
 
 class AStarCornersAgent(SearchAgent):
   "A SearchAgent for CornersProblem using A* and your cornersHeuristic"
@@ -460,7 +460,7 @@ def foodHeuristic(state, problem):
   total = 0
   for food in foodGrid.asList():
     total += (abs(state[0][0] - food[0]) + abs(state[0][1] - food[1]))
-  return total
+  return int(pow(total * 2, 0.5))
   
 class ClosestDotSearchAgent(SearchAgent):
   "Search for all food using a sequence of searches"
@@ -489,7 +489,6 @@ class ClosestDotSearchAgent(SearchAgent):
 
     "*** YOUR CODE HERE ***"
     return search.uniformCostSearch(problem)
-    util.raiseNotDefined()
   
 class AnyFoodSearchProblem(PositionSearchProblem):
   """
