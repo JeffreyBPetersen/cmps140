@@ -363,10 +363,17 @@ def cornersHeuristic(state, problem):
   "*** YOUR CODE HERE ***"
   #state[0] is current position
   #state[1] is visited corners
+  #corner order: left-bottom, left-top, right-bottom, right-top
+  #right, top = corners[2][0], corners[1][1]
+  mDist = [0,0,0,0]
   total = 0
   for corner in range(4):
-    total += (abs(state[0][0] - corners[corner][0]) + abs(state[0][1] - corners[corner][1]))*(not state[1][corner])
-  return int(pow(total * 2, 0.5))
+    mDist[corner] = (
+        abs(state[0][0] - corners[corner][0]) + 
+        abs(state[0][1] - corners[corner][1])
+      ) * (not state[1][corner])
+  mDist.sort()
+  return mDist[3]
 
 class AStarCornersAgent(SearchAgent):
   "A SearchAgent for CornersProblem using A* and your cornersHeuristic"
@@ -457,10 +464,11 @@ def foodHeuristic(state, problem):
   """
   position, foodGrid = state
   "*** YOUR CODE HERE ***"
-  total = 0
+  total = [0,0]
   for food in foodGrid.asList():
-    total += (abs(state[0][0] - food[0]) + abs(state[0][1] - food[1]))
-  return int(pow(total * 2, 0.5))
+    total[0] += abs(state[0][0] - food[0])
+    total[1] += abs(state[0][1] - food[1])
+  return int(pow(total[0] * 2, 0.5)) + int(pow(total[1] * 2, 0.5))
   
 class ClosestDotSearchAgent(SearchAgent):
   "Search for all food using a sequence of searches"
