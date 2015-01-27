@@ -281,12 +281,16 @@ class CornersProblem(search.SearchProblem):
   def getStartState(self):
     "Returns the start state (in your state space, not the full Pacman state space)"
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return (self.startingPosition, (
+      self.startingPosition == self.corners[0],
+      self.startingPosition == self.corners[1],
+      self.startingPosition == self.corners[2],
+      self.startingPosition == self.corners[3]))
     
   def isGoalState(self, state):
     "Returns whether this search state is a goal state of the problem"
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return state[1][0] and state[1][1] and state[1][2] and state[1][3]
        
   def getSuccessors(self, state):
     """
@@ -310,6 +314,17 @@ class CornersProblem(search.SearchProblem):
       #   hitsWall = self.walls[nextx][nexty]
       
       "*** YOUR CODE HERE ***"
+      x, y = state[0]
+      dx, dy = Actions.directionToVector(action)
+      nextx, nexty = int(x + dx), int(y + dy)
+      if not self.walls[nextx][nexty]:
+        successors.append((
+          ((nextx,nexty),(
+          ((nextx, nexty) == self.corners[0]) or state[1][0],
+          ((nextx, nexty) == self.corners[1]) or state[1][1],
+          ((nextx, nexty) == self.corners[2]) or state[1][2],
+          ((nextx, nexty) == self.corners[3]) or state[1][3])
+        ), action, 1))
       
     self._expanded += 1
     return successors
@@ -346,10 +361,15 @@ def cornersHeuristic(state, problem):
   walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
   
   "*** YOUR CODE HERE ***"
-  return 0 # Default to trivial solution
+  #state[0] is current position
+  #state[1] is visited corners
+  total = 0
+  for corner in range(4):
+    total += (abs(state[0][0] - corners[corner][0]) + abs(state[0][1] - corners[corner][1]))*(not state[1][corner])
+  return total
 
 class AStarCornersAgent(SearchAgent):
-  "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
+  "A SearchAgent for CornersProblem using A* and your cornersHeuristic"
   def __init__(self):
     self.searchFunction = lambda prob: search.aStarSearch(prob, cornersHeuristic)
     self.searchType = CornersProblem
@@ -437,7 +457,10 @@ def foodHeuristic(state, problem):
   """
   position, foodGrid = state
   "*** YOUR CODE HERE ***"
-  return 0
+  total = 0
+  for food in foodGrid.asList():
+    total += (abs(state[0][0] - food[0]) + abs(state[0][1] - food[1]))
+  return total
   
 class ClosestDotSearchAgent(SearchAgent):
   "Search for all food using a sequence of searches"
@@ -465,6 +488,7 @@ class ClosestDotSearchAgent(SearchAgent):
     problem = AnyFoodSearchProblem(gameState)
 
     "*** YOUR CODE HERE ***"
+    return search.uniformCostSearch(problem)
     util.raiseNotDefined()
   
 class AnyFoodSearchProblem(PositionSearchProblem):
@@ -499,9 +523,8 @@ class AnyFoodSearchProblem(PositionSearchProblem):
     that will complete the problem definition.
     """
     x,y = state
-    
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return (x,y) in self.food.asList()
 
 ##################
 # Mini-contest 1 #

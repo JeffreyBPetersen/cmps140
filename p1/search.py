@@ -127,7 +127,20 @@ def breadthFirstSearch(problem):
       
 def uniformCostSearch(problem):
   "Search the node of least total cost first. "
-  "*** YOUR CODE HERE ***"
+  "*** YOUR CODE HERE ***" #completed
+  frontier = util.PriorityQueue()
+  # ((current position, total cost, directions to position), priority)
+  frontier.push((problem.getStartState(), 0, []), 0)
+  explored = []
+  while not frontier.isEmpty():
+    node = frontier.pop()
+    if not node[0] in explored:
+      if problem.isGoalState(node[0]):
+        return node[2]
+      explored.append(node[0])
+      for move in problem.getSuccessors(node[0]):
+        if not move[0] in explored:
+          frontier.push((move[0], node[1] + move[2], node[2] + [move[1]]), node[1] + move[2])
   
   util.raiseNotDefined()
 
@@ -140,8 +153,21 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
   "Search the node that has the lowest combined cost and heuristic first."
-  "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
+  "*** YOUR CODE HERE ***" #complete
+  frontier = util.PriorityQueue()
+  # ((current position, total cost, directions to position), priority)
+  frontier.push((problem.getStartState(), 0, []), 0)
+  explored = []
+  while not frontier.isEmpty():
+    node = frontier.pop()
+    if not node[0] in explored:
+      if problem.isGoalState(node[0]):
+        return node[2]
+      explored.append(node[0])
+      for move in problem.getSuccessors(node[0]):
+        if not move[0] in explored:
+          frontier.push((move[0], node[1] + move[2], node[2] + [move[1]]),
+            node[1] + move[2] + heuristic(move[0], problem))
     
   
 # Abbreviations
