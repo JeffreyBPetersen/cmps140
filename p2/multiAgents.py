@@ -42,6 +42,7 @@ class ReflexAgent(Agent):
     chosenIndex = random.choice(bestIndices) # Pick randomly among the best
 
     "Add more of your code here if you want to"
+    #print "scores: ", scores, ", bestScore: ", bestScore, ", bestIndices: ", bestIndices, ", chosenIndex: ", chosenIndex
 
     return legalMoves[chosenIndex]
 
@@ -68,6 +69,31 @@ class ReflexAgent(Agent):
     newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
     "*** YOUR CODE HERE ***"
+    score = 0
+    pacPos = successorGameState.getPacmanPosition()
+    foodList = successorGameState.getFood().asList()
+    ghostable = []
+    for ghostState in newGhostStates:
+      ghostPos = ghostState.getPosition()
+      #print "ghostState: ", ghostState, ", ghostPos: ", ghostPos
+      #print "pacPos: ", pacPos
+      ghostable.append((ghostPos[0],ghostPos[1]))
+      ghostable.append((ghostPos[0],ghostPos[1] - 1))
+      ghostable.append((ghostPos[0],ghostPos[1] + 1))
+      ghostable.append((ghostPos[0] - 1,ghostPos[1]))
+      ghostable.append((ghostPos[0] + 1,ghostPos[1]))
+    if len(foodList) > 0:
+      score -= abs(pacPos[0] - foodList[0][0]) + abs(pacPos[1] - foodList[0][1])
+    if len(successorGameState.getFood().asList()) < len(currentGameState.getFood().asList()):
+      score = 0
+    if pacPos in ghostable:
+      score -= 500
+    #print "ghostable: ", ghostable
+    #print "pacPos: ", pacPos
+    #print "score: ", score
+    #print "currentFood: ", successorGameState.getFood().asList(), "\n"
+    return score
+    
     return successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState):
