@@ -295,6 +295,13 @@ def betterEvaluationFunction(currentGameState):
     DESCRIPTION: <write something here so we know what you did>
   """
   "*** YOUR CODE HERE ***"
+  scoreModifier = 0
+  pacPos = currentGameState.getPacmanPosition()
+  foodList = currentGameState.getFood().asList()
+  if len(foodList) > 0:
+    scoreModifier -= abs(pacPos[0] - foodList[0][0]) + abs(pacPos[1] - foodList[0][1])
+  return currentGameState.getScore() + scoreModifier
+  
   util.raiseNotDefined()
 
 # Abbreviation
