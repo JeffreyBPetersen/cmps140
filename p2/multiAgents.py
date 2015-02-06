@@ -255,7 +255,37 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
       legal moves.
     """
     "*** YOUR CODE HERE ***"
+    scoreActions = []
+    for action in gameState.getLegalActions(0):
+      scoreActions.append((self.emHelper(1, 0, gameState.generateSuccessor(0, action)), action))
+    bestScore = max(scoreActions)[0]
+    bestActions = [scoreAction[1] for scoreAction in scoreActions if scoreAction[0] == bestScore]
+    #print "scoreActions: ", scoreActions
+    #print "bestScore: ", bestScore
+    #print "bestActions: ", bestActions
+    return random.choice(bestActions)
+    
     util.raiseNotDefined()
+    
+  def emHelper(self, current_agent, current_depth, gameState):
+    if current_agent == gameState.getNumAgents():
+      current_agent = 0
+      current_depth += 1
+      if current_depth == self.depth:
+        #print "self.evaluationFunction(gameState): ", self.evaluationFunction(gameState)
+        return self.evaluationFunction(gameState)
+    
+    #print "gameState.getLegalActions(current_agent): ", gameState.getLegalActions(current_agent)
+    scores = []
+    actions = gameState.getLegalActions(current_agent)
+    if len(actions) == 0:
+      return self.evaluationFunction(gameState)
+    for action in actions:
+      scores.append(self.emHelper(current_agent + 1, current_depth, gameState.generateSuccessor(current_agent, action)))
+    #print "scores: ", scores
+    if current_agent == 0:
+      return max(scores)
+    return sum(scores) / len(scores)
 
 def betterEvaluationFunction(currentGameState):
   """
