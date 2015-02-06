@@ -152,7 +152,42 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns the total number of agents in the game
     """
     "*** YOUR CODE HERE ***"
+    #print "gameState.getNumAgents(): ", gameState.getNumAgents()
+    #print "self.depth: ", self.depth
+    
+    scoreActions = []
+    for action in gameState.getLegalActions(0):
+      scoreActions.append((self.minimaxHelper(1, 0, gameState.generateSuccessor(0, action)), action))
+    bestScore = max(scoreActions)[0]
+    bestActions = [scoreAction[1] for scoreAction in scoreActions if scoreAction[0] == bestScore]
+    #print "scoreActions: ", scoreActions
+    #print "bestScore: ", bestScore
+    #print "bestActions: ", bestActions
+    return random.choice(bestActions)
+    
     util.raiseNotDefined()
+    
+  def minimaxHelper(self, current_agent, current_depth, gameState):
+    #print "current_agent: ", current_agent
+    #print "current_depth: ", current_depth
+    if current_agent == gameState.getNumAgents():
+      current_agent = 0
+      current_depth += 1
+      if current_depth == self.depth:
+        #print "self.evaluationFunction(gameState): ", self.evaluationFunction(gameState)
+        return self.evaluationFunction(gameState)
+    
+    #print "gameState.getLegalActions(current_agent): ", gameState.getLegalActions(current_agent)
+    scores = []
+    actions = gameState.getLegalActions(current_agent)
+    if len(actions) == 0:
+      return self.evaluationFunction(gameState)
+    for action in actions:
+      scores.append(self.minimaxHelper(current_agent + 1, current_depth, gameState.generateSuccessor(current_agent, action)))
+    #print "scores: ", scores
+    if current_agent == 0:
+      return max(scores)
+    return min(scores)
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
   """
