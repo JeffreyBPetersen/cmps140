@@ -199,7 +199,48 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
       Returns the minimax action using self.depth and self.evaluationFunction
     """
     "*** YOUR CODE HERE ***"
+    scoreActions = []
+    alpha, beta = float("-inf"), float("inf")
+    for action in gameState.getLegalActions(0):
+      result = self.abHelper(alpha, beta, 1, 0, gameState.generateSuccessor(0, action))
+      scoreActions.append((result[0], action))
+      alpha, beta = result[1], result[2]
+    bestScore = max(scoreActions)[0]
+    bestActions = [scoreAction[1] for scoreAction in scoreActions if scoreAction[0] == bestScore]
+    #print "scoreActions: ", scoreActions
+    #print "bestScore: ", bestScore
+    #print "bestActions: ", bestActions
+    return random.choice(bestActions)
+    
     util.raiseNotDefined()
+    
+  def abHelper(self, alpha, beta, current_agent, current_depth, gameState): #returns (score, alpha, beta)
+    if current_agent == gameState.getNumAgents():
+      current_agent = 0
+      current_depth += 1
+      if current_depth == self.depth:
+        #print "self.evaluationFunction(gameState): ", self.evaluationFunction(gameState)
+        return (self.evaluationFunction(gameState), alpha, beta)
+    scores = []
+    actions = gameState.getLegalActions(current_agent)
+    if len(actions) == 0:
+      return (self.evaluationFunction(gameState), alpha, beta)
+    for action in actions:
+      result = self.abHelper(alpha, beta, current_agent + 1, current_depth, gameState.generateSuccessor(current_agent, action))
+      if current_agent == 0:
+        if result[0] >= beta:
+          return (result[0], alpha, beta)
+        alpha = max(result[0], alpha)
+      else:
+        if result[0] <= alpha:
+          return (result[0], alpha, beta)
+        beta = max(result[0], beta)
+      scores.append(result[0])
+      alpha, beta = result[1], result[2]
+    if current_agent == 0:
+      return (max(scores), alpha, beta)
+    return (min(scores), alpha, beta)
+    
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
   """
