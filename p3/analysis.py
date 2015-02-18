@@ -15,7 +15,7 @@
 
 def question2():
   answerDiscount = 0.9
-  answerNoise = 0.2
+  answerNoise = 0.0169 #highest noise to cross bridge to 3 significant figures
   return answerDiscount, answerNoise
 
 def question3a():
@@ -26,7 +26,7 @@ def question3a():
   # If not possible, return 'NOT POSSIBLE'
 
 def question3b():
-  answerDiscount = 0.9
+  answerDiscount = 0.3
   answerNoise = 0.2
   answerLivingReward = 0.0
   return answerDiscount, answerNoise, answerLivingReward
@@ -35,7 +35,7 @@ def question3b():
 def question3c():
   answerDiscount = 0.9
   answerNoise = 0.2
-  answerLivingReward = 0.0
+  answerLivingReward = -1.0
   return answerDiscount, answerNoise, answerLivingReward
   # If not possible, return 'NOT POSSIBLE'
 
@@ -49,7 +49,7 @@ def question3d():
 def question3e():
   answerDiscount = 0.9
   answerNoise = 0.2
-  answerLivingReward = 0.0
+  answerLivingReward = 1.0
   return answerDiscount, answerNoise, answerLivingReward
   # If not possible, return 'NOT POSSIBLE'
 
