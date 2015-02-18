@@ -38,6 +38,7 @@ class QLearningAgent(ReinforcementAgent):
     ReinforcementAgent.__init__(self, **args)
 
     "*** YOUR CODE HERE ***"
+    self.states = {}
 
   def getQValue(self, state, action):
     """
@@ -46,6 +47,13 @@ class QLearningAgent(ReinforcementAgent):
       a state or (state,action) tuple
     """
     "*** YOUR CODE HERE ***"
+    # lookup Q Value, return 0 if not found
+    if not state in self.states:
+      return 0.0
+    if not action in self.states[state]:
+      return 0.0
+    return self.states[state][action]
+    
     util.raiseNotDefined()
 
 
@@ -57,6 +65,16 @@ class QLearningAgent(ReinforcementAgent):
       terminal state, you should return a value of 0.0.
     """
     "*** YOUR CODE HERE ***"
+    # find maximum score attainable from available actions
+    bestScore = None
+    for action in self.getLegalActions(state):
+      score = self.getQValue(state,action)
+      if score > bestScore:
+        bestScore = score
+    if not bestScore:
+      return 0.0
+    return bestScore
+    
     util.raiseNotDefined()
 
   def getPolicy(self, state):
@@ -66,6 +84,20 @@ class QLearningAgent(ReinforcementAgent):
       you should return None.
     """
     "*** YOUR CODE HERE ***"
+    # find best actions by maximum score including ties, return randomly from best actions
+    bestScore = None
+    bestActions = []
+    for action in self.getLegalActions(state):
+      score = self.getQValue(state,action)
+      if score > bestScore:
+        bestScore = score
+        bestActions = [action]
+      elif score == bestScore:
+        bestActions.append(action)
+    if not bestActions:
+      return None
+    return random.choice(bestActions)
+    
     util.raiseNotDefined()
 
   def getAction(self, state):
@@ -83,9 +115,12 @@ class QLearningAgent(ReinforcementAgent):
     legalActions = self.getLegalActions(state)
     action = None
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
-
-    return action
+    # choose action randomly with epsilon chance, else choose action by policy
+    if not legalActions:
+      return None
+    if random.random() < self.epsilon:
+      return random.choice(legalActions)
+    return self.getPolicy(state)
 
   def update(self, state, action, nextState, reward):
     """
@@ -97,7 +132,13 @@ class QLearningAgent(ReinforcementAgent):
       it will be called on your behalf
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # ensure state is initialized, calculate and set new Q Value of state
+    if not state in self.states:
+      self.states[state] = {}
+    self.states[state][action] = (
+         self.alpha  * (self.discount * self.getValue(nextState) + reward) +
+      (1-self.alpha) *  self.getQValue(state,action)
+    )
 
 class PacmanQAgent(QLearningAgent):
   "Exactly the same as QLearningAgent, but with different default parameters"
@@ -145,6 +186,7 @@ class ApproximateQAgent(PacmanQAgent):
 
     # You might want to initialize weights here.
     "*** YOUR CODE HERE ***"
+    self.weights = {}
 
   def getQValue(self, state, action):
     """
@@ -152,14 +194,25 @@ class ApproximateQAgent(PacmanQAgent):
       where * is the dotProduct operator
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # sum all features, adding unidentified features with an initial weight of 0
+    total = 0
+    features = self.featExtractor.getFeatures(state,action)
+    for feature in features:
+      if not feature in self.weights:
+        self.weights[feature] = 0
+      total += self.weights[feature] * features[feature]
+    return total
 
   def update(self, state, action, nextState, reward):
     """
        Should update your weights based on transition
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # update each feature in turn using the Q-Learning formula
+    features = self.featExtractor.getFeatures(state,action)
+    for feature in features:
+      correction = reward + self.discount * self.getValue(nextState) - self.getQValue(state,action)
+      self.weights[feature] = self.weights[feature] + self.alpha * correction * features[feature]
 
   def final(self, state):
     "Called at the end of each game."
