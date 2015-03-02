@@ -118,10 +118,22 @@ class ExactInference(InferenceModule):
     allPossible = util.Counter()
     for p in self.legalPositions:
       trueDistance = util.manhattanDistance(p, pacmanPosition)
-      if emissionModel[trueDistance] > 0: allPossible[p] = 1.0
+      #if emissionModel[trueDistance] > 0: allPossible[p] = 1.0
+      
+      # maximum taken to prevent probabilities going to zero and improve tracking of moving ghosts
+      allPossible[p] = max(emissionModel[trueDistance] * (self.beliefs[p]), emissionModel[trueDistance] / pow(len(self.legalPositions),4))
+      # simple probabilities version commented out below, best for unmoving ghosts
+      #allPossible[p] = emissionModel[trueDistance] * (self.beliefs[p])
+    
     allPossible.normalize()
         
     "*** YOUR CODE HERE ***"
+    print "noisyDistance: ", noisyDistance
+    #print "emissionModel: ", emissionModel
+    #print "self.legalPositions: ", self.legalPositions
+    print "self.beliefs: ", self.beliefs
+    print "pacmanPosition: ", pacmanPosition
+    
     self.beliefs = allPossible
     
   def elapseTime(self, gameState):
