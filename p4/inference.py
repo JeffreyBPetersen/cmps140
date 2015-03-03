@@ -420,7 +420,6 @@ class JointParticleFilter:
           values = list(particle)
           values[i] = (i * 2 + 1, 1)
           particle = tuple(values)
-          
       totalWeights[particle] += weight
     if sum(i[1] for i in totalWeights.items()) == 0:
       self.initializeParticles()
@@ -428,7 +427,7 @@ class JointParticleFilter:
       totalWeights.normalize()
       for i in range(self.numParticles):
         newParticles.append(util.sample(totalWeights))
-    self.particles = newParticles
+      self.particles = newParticles
     
     # Remove this line to complete implementation.
     #util.raiseNotDefined()
