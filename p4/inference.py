@@ -372,6 +372,11 @@ class JointParticleFilter:
     for oldParticle in self.particles:
       newParticle = list(oldParticle) # A list of ghost positions
       "*** YOUR CODE HERE ***"
+      for i in range(self.numGhosts):
+        newPosDist = getPositionDistributionForGhost(setGhostPositions(gameState, oldParticle),
+                                                   i + 1, self.ghostAgents[i])
+        if sum(i[1] for i in newPosDist.items()) > 0:
+          newParticle[i] = util.sample(newPosDist)
       newParticles.append(tuple(newParticle))
     self.particles = newParticles
   
@@ -403,8 +408,30 @@ class JointParticleFilter:
     emissionModels = [busters.getObservationDistribution(dist) for dist in noisyDistances]
 
     "*** YOUR CODE HERE ***"
+    #print "self.particles[0] ", self.particles[0], "\nlen(self.particles): ", len(self.particles), "\n"
+    totalWeights = util.Counter()
+    newParticles = []
+    for particle in self.particles:
+      weight = 1
+      for i in range(self.numGhosts):
+        if noisyDistances[i] != 999:
+          weight *= emissionModels[i][util.manhattanDistance(particle[i], pacmanPosition)]
+        else:
+          values = list(particle)
+          values[i] = (i * 2 + 1, 1)
+          particle = tuple(values)
+          
+      totalWeights[particle] += weight
+    if sum(i[1] for i in totalWeights.items()) == 0:
+      self.initializeParticles()
+    else:
+      totalWeights.normalize()
+      for i in range(self.numParticles):
+        newParticles.append(util.sample(totalWeights))
+    self.particles = newParticles
+    
     # Remove this line to complete implementation.
-    util.raiseNotDefined()
+    #util.raiseNotDefined()
   
   def getBeliefDistribution(self):
     dist = util.Counter()
